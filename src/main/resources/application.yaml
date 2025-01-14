@@ -26,7 +26,7 @@ spring:
 logging:
   level:
     org.mockserver: WARN
-    org.org.springframework.security: WARN
+    org.springframework.security: WARN
     org.springframework.cloud.gateway: WARN
 #    reactor.netty.http.client: DEBUG
 #    reactor.netty.http.server: DEBUG
