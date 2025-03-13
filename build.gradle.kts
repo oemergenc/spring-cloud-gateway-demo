@@ -2,14 +2,14 @@ import com.diffplug.gradle.spotless.SpotlessExtension
 
 plugins {
     java
-    id("org.springframework.boot") version "3.3.4"
+    id("org.springframework.boot") version "3.4.3"
     id("com.diffplug.spotless") version "7.0.0"
 }
 
-val springBootVersion = "3.3.4"
+val springBootVersion = "3.4.3"
 val grpcBomVersion = "1.70.0"
-val springCloudDependenciesVersion = "2023.0.3"
-val springCloudGcpDependenciesVersion = "5.10.0"
+val springCloudDependenciesVersion = "2024.0.0"
+val springCloudGcpDependenciesVersion = "6.1.0"
 val testContainersVersion = "1.20.4"
 
 java.sourceCompatibility = JavaVersion.VERSION_17
