@@ -5,6 +5,8 @@ local:
     port: 8080
 
 spring:
+  reactor:
+    context-propagation: auto
   cloud:
     gateway:
       routes:
@@ -15,13 +17,6 @@ spring:
             - Method=GET
           filters:
             - RewritePath=/question-route, /question
-
-  sleuth:
-    enabled: true
-    propagation:
-      type: b3,w3c
-    reactor:
-      instrumentation-type: decorate_queues
 
 logging:
   level:

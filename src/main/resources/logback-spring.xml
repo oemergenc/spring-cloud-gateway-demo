@@ -4,10 +4,12 @@
     <property name="LOGS" value="./logs" />
 
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>
-                %d{dd-MM-yyyy HH:mm:ss.SSS} %magenta([%thread]) %green([T:%X{traceId:-},S:%X{spanId:-}]) %highlight(%-5level) %logger{36} - %msg%n
-            </pattern>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeContext>false</includeContext>
+            <customFields>{"application":"gateway"}</customFields>
+            <includeMdcKeyName>traceId</includeMdcKeyName>
+            <includeMdcKeyName>spanId</includeMdcKeyName>
+            <provider class="net.logstash.logback.composite.loggingevent.ArgumentsJsonProvider"/>
         </encoder>
     </appender>
 

@@ -2,15 +2,16 @@ import com.diffplug.gradle.spotless.SpotlessExtension
 
 plugins {
     java
-    kotlin("jvm") version "1.9.22"
-    id("org.springframework.boot") version "3.2.1"
-    id("com.diffplug.spotless") version "6.25.0"
+    id("org.springframework.boot") version "3.3.4"
+    id("com.diffplug.spotless") version "7.0.0"
 }
 
-val springBootVersion = "3.2.1"
-val grpcBomVersion = "1.61.0"
-val springCloudDependenciesVersion = "2023.0.0"
-val springCloudGcpDependenciesVersion = "5.0.0"
+val springBootVersion = "3.3.4"
+val grpcBomVersion = "1.70.0"
+val springCloudDependenciesVersion = "2023.0.3"
+val springCloudGcpDependenciesVersion = "5.10.0"
+val testContainersVersion = "1.20.4"
+
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
@@ -33,16 +34,21 @@ dependencies {
 
     // Logging
     implementation("io.micrometer:context-propagation")
-    implementation("io.micrometer:micrometer-tracing-bridge-brave")
+    implementation("net.logstash.logback:logstash-logback-encoder:7.4")
 
     // Metrics
     implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("io.projectreactor:reactor-core-micrometer:1.2.3")
 
 
-    testImplementation("org.testcontainers:testcontainers:1.19.6")
+    testImplementation("org.testcontainers:testcontainers:$testContainersVersion")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.rest-assured:rest-assured")
     testImplementation("org.mock-server:mockserver-spring-test-listener:5.15.0")
+    testImplementation("org.wiremock:wiremock-standalone:3.0.1")
+    testImplementation("net.javacrumbs.json-unit:json-unit-fluent:2.38.0")
+
+
 }
 
 tasks.withType<Test> {

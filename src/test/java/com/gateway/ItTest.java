@@ -1,37 +1,77 @@
 package com.gateway;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static net.javacrumbs.jsonunit.fluent.JsonFluentAssert.assertThatJson;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
-import java.util.Objects;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import java.io.BufferedReader;
+import java.io.StringReader;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import org.hamcrest.text.MatchesPattern;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.http.HttpStatus;
 
-public class ItTest extends AbstractTestBase {
+public class ItTest extends AbstractTestBaseIT {
 
-  @ParameterizedTest
-  @ValueSource(strings = {"/question-route", "/question-controller"})
-  void test(String path) {
-    sendRequest(path);
-    assertThat(appender.list)
-        .filteredOn(event -> Objects.equals(event.getLoggerName(), filterLogger.getName()))
-        .hasSize(1)
-        .singleElement()
-        .matches(
-            event -> event.getMDCPropertyMap().containsKey("traceId"),
-            "expected controller log to contain traceId")
-        .matches(
-            event -> event.getMDCPropertyMap().containsKey("spanId"),
-            "expected controller log to contain spanId");
+  @Test
+  void accessLogWritten(CapturedOutput capturedOutput) {
+    stubFor(get("/question").willReturn(aResponse()));
 
-    assertThat(appender.list)
-        .filteredOn(event -> Objects.equals(event.getLoggerName(), accessLogLogger.getName()))
-        .hasSize(1)
-        .singleElement()
-        .matches(
-            event -> event.getMDCPropertyMap().containsKey("traceId"),
-            "expected controller log to contain traceId")
-        .matches(
-            event -> event.getMDCPropertyMap().containsKey("spanId"),
-            "expected controller log to contain spanId");
+    var result =
+        this.testClient
+            .get()
+            .uri("/question-route")
+            .exchange()
+            .expectBody(String.class)
+            .returnResult();
+
+    assertThat(result.getStatus().value()).isEqualTo(HttpStatus.OK.value());
+
+    var loggedLines = extractLogs(capturedOutput, this::isGatewayLog);
+
+    assertThat(result.getStatus().value()).isEqualTo(HttpStatus.OK.value());
+    assertThat(loggedLines)
+        .isNotEmpty()
+        .anySatisfy(
+            logLine ->
+                assertThatJson(logLine)
+                    .node("@timestamp")
+                    .isPresent()
+                    .node("method")
+                    .isEqualTo("GET")
+                    .node("protocol")
+                    .isEqualTo("HTTP/2.0")
+                    .node("upstreamCallInfo.httpStatus")
+                    .isEqualTo(HttpStatus.OK.value())
+                    .node("upstreamCallInfo.methodAndPath")
+                    .matches(new MatchesPattern(Pattern.compile("GET http://.*/question$")))
+                    .node("upstreamCallInfo.duration")
+                    .isPresent());
+    verify(1, getRequestedFor(urlPathMatching("/question")));
+  }
+
+  private boolean isGatewayLog(String logLine) {
+    return logLine.contains("\"application\":\"gateway\"");
+  }
+
+  private List<String> extractLogs(CapturedOutput capturedOutput, Predicate<String> p) {
+    return await().until(() -> extractOutputFor(capturedOutput, p), logs -> !logs.isEmpty());
+  }
+
+  private List<String> extractOutputFor(CapturedOutput output, Predicate<String> p) {
+    return new BufferedReader(new StringReader(output.getOut()))
+        .lines()
+        .filter(s -> s.startsWith("{") && p.test(s))
+        .collect(Collectors.toList());
   }
 }
