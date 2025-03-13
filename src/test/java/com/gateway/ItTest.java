@@ -37,7 +37,7 @@ public class ItTest extends AbstractTestBaseIT {
 
     assertThat(result.getStatus().value()).isEqualTo(HttpStatus.OK.value());
 
-    var loggedLines = extractLogs(capturedOutput, this::isGatewayLog);
+    var loggedLines = extractLogs(capturedOutput, this::isAccessLog);
 
     assertThat(result.getStatus().value()).isEqualTo(HttpStatus.OK.value());
     assertThat(loggedLines)
@@ -60,8 +60,8 @@ public class ItTest extends AbstractTestBaseIT {
     verify(1, getRequestedFor(urlPathMatching("/question")));
   }
 
-  private boolean isGatewayLog(String logLine) {
-    return logLine.contains("\"application\":\"gateway\"");
+  private boolean isAccessLog(String logLine) {
+    return logLine.contains("\"logger_name\":\"com.gateway.accesslog.MyAccessLogHandler\"");
   }
 
   private List<String> extractLogs(CapturedOutput capturedOutput, Predicate<String> p) {

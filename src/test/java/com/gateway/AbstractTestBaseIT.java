@@ -3,6 +3,8 @@ package com.gateway;
 import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
 
 import com.gateway.util.WiremockContainer;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +37,10 @@ public class AbstractTestBaseIT {
   static void configureProperties(DynamicPropertyRegistry registry) {
     final String wiremockUrl = "http://" + wiremock.getHost() + ":" + wiremock.getFirstMappedPort();
     System.setProperty("MOCK_BACKEND", wiremockUrl);
+  }
+
+  @BeforeEach
+  public void beforeEach() {
+    WireMock.reset();
   }
 }
