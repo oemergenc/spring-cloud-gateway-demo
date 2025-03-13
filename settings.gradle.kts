@@ -1,1 +1,1 @@
-rootProject.name = "spring-cloud-gateway-upgrade"
+rootProject.name = "spring-cloud-gateway-demo"
