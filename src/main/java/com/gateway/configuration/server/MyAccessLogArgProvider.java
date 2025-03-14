@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gateway.accesslog;
+package com.gateway.configuration.server;
 
 import com.gateway.configuration.UpstreamCallInfo;
 import io.netty.handler.codec.http.HttpMethod;
@@ -30,8 +30,6 @@ import reactor.netty.http.server.HttpServerRequest;
 import reactor.util.annotation.Nullable;
 
 class MyAccessLogArgProvider {
-
-  static final String H2_PROTOCOL_NAME = "HTTP/2.0";
 
   HttpServerRequest request;
   HttpResponse response;
@@ -110,7 +108,7 @@ class MyAccessLogArgProvider {
     if (request != null) {
       method = request.method().name();
       uri = request.uri();
-      protocol = H2_PROTOCOL_NAME;
+      protocol = request.protocol();
     }
     return this;
   }

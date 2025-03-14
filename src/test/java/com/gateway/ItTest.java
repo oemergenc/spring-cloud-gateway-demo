@@ -50,7 +50,7 @@ public class ItTest extends AbstractTestBaseIT {
                     .node("method")
                     .isEqualTo("GET")
                     .node("protocol")
-                    .isEqualTo("HTTP/2.0")
+                    .isEqualTo("HTTP/1.1")
                     .node("upstreamCallInfo.httpStatus")
                     .isEqualTo(HttpStatus.OK.value())
                     .node("upstreamCallInfo.methodAndPath")
@@ -61,7 +61,8 @@ public class ItTest extends AbstractTestBaseIT {
   }
 
   private boolean isAccessLog(String logLine) {
-    return logLine.contains("\"logger_name\":\"com.gateway.accesslog.MyAccessLogHandler\"");
+    return logLine.contains(
+        "\"logger_name\":\"com.gateway.configuration.server.MyAccessLogHandler\"");
   }
 
   private List<String> extractLogs(CapturedOutput capturedOutput, Predicate<String> p) {

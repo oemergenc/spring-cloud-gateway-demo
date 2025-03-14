@@ -1,7 +1,6 @@
 package com.gateway.configuration.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gateway.accesslog.MyAccessLogHandler;
 import java.util.function.Function;
 import org.springframework.boot.web.embedded.netty.NettyServerCustomizer;
 import org.springframework.context.annotation.Bean;

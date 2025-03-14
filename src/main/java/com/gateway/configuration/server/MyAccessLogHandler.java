@@ -1,4 +1,4 @@
-package com.gateway.accesslog;
+package com.gateway.configuration.server;
 
 import static com.gateway.configuration.server.UpstreamCallInfoOutboundHandler.UPSTREAM_CALL_INFO_ATTRIBUTE_KEY;
 
